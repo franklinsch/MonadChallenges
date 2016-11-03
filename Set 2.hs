@@ -44,13 +44,10 @@ queryGreek d k = divVal
     Just xs'   -> tailMay xs'
   maxTail = case tail of
     Nothing    -> Nothing
-    Just tail  -> maximumMay tail
-  head = case xs of
-    Nothing    -> Nothing
-    Just xs'   -> headMay xs'
-  divVal = case head of
-    Nothing    -> Nothing
-    Just head' -> case maxTail of 
-      Nothing -> Nothing
-      Just maxTail' -> divMay (fromIntegral maxTail') (fromIntegral head')
+    Just tail' -> maximumMay tail'
+  Just xs' = xs
+  Just head = headMay xs'
+  divVal = case maxTail of
+    Nothing       -> Nothing
+    Just maxTail' -> divMay (fromIntegral maxTail') (fromIntegral head)
 
