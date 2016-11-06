@@ -51,3 +51,18 @@ queryGreek d k = divVal
     Nothing       -> Nothing
     Just maxTail' -> divMay (fromIntegral maxTail') (fromIntegral head)
 
+chain :: (a -> Maybe b) -> Maybe a -> Maybe b
+chain f (Just a) = f a
+chain f Nothing  = Nothing
+
+link :: Maybe a -> (a -> Maybe b) -> Maybe b
+link = flip chain
+
+queryGreek2 :: GreekData -> String -> Maybe Double
+queryGreek2 g s = divVal
+  where
+    xs = lookupMay s g
+    tail = link xs tailMay
+    maxTail = link tail maximumMay
+    Just head = link xs headMay
+    divVal = link maxTail (flip divMay (fromIntegral head) . fromIntegral)
