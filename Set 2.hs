@@ -35,6 +35,11 @@ minimumMay :: Ord a => [a] -> Maybe a
 minimumMay [] = Nothing 
 minimumMay xs = Just (foldr1 (min) xs)
 
+addMay :: Num a => Maybe a -> Maybe a -> Maybe a
+addMay Nothing _ = Nothing
+addMay _ Nothing = Nothing
+addMay (Just a) (Just b) = Just (a + b)
+
 queryGreek :: GreekData -> String -> Maybe Double
 queryGreek d k = divVal
   where 
@@ -66,3 +71,11 @@ queryGreek2 g s = divVal
     maxTail = link tail maximumMay
     Just head = link xs headMay
     divVal = link maxTail (flip divMay (fromIntegral head) . fromIntegral)
+
+addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
+addSalaries sals p1 p2 = sum
+  where 
+    p1Sal = lookupMay p1 sals
+    p2Sal = lookupMay p2 sals
+    sum = addMay p1Sal p2Sal
+
