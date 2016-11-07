@@ -64,13 +64,12 @@ link :: Maybe a -> (a -> Maybe b) -> Maybe b
 link = flip chain
 
 queryGreek2 :: GreekData -> String -> Maybe Double
-queryGreek2 g s = divVal
-  where
-    xs = lookupMay s g
-    tail = link xs tailMay
-    maxTail = link tail maximumMay
-    Just head = link xs headMay
-    divVal = link maxTail (flip divMay (fromIntegral head) . fromIntegral)
+queryGreek2 g s
+  = link (lookupMay s g) (\xs ->
+    link (headMay xs) (\head ->
+    link (tailMay xs) (\tail -> 
+    link (maximumMay tail) (\maxTail ->
+    divMay (fromIntegral maxTail) (fromIntegral head)))))
 
 addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
 addSalaries sals p1 p2 = sum
@@ -78,4 +77,3 @@ addSalaries sals p1 p2 = sum
     p1Sal = lookupMay p1 sals
     p2Sal = lookupMay p2 sals
     sum = addMay p1Sal p2Sal
-
