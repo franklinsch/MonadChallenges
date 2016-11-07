@@ -75,5 +75,16 @@ addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
 addSalaries sals p1 p2
   = link (lookupMay p1 sals) (\p1Sal ->
     link (lookupMay p2 sals) (\p2Sal ->
-    Just (p1Sal + p2Sal)))
+    mkMaybe (p1Sal + p2Sal)))
     
+yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+yLink f a b
+  = link a (\a ->
+    link b (\b -> 
+    mkMaybe (f a b)))
+
+addSalaries2 :: [(String, Integer)] -> String -> String -> Maybe Integer
+addSalaries2 sals p1 p2 = yLink (+) (lookupMay p1 sals) (lookupMay p2 sals)
+
+mkMaybe :: a -> Maybe a
+mkMaybe = Just
