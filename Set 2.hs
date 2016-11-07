@@ -35,11 +35,6 @@ minimumMay :: Ord a => [a] -> Maybe a
 minimumMay [] = Nothing 
 minimumMay xs = Just (foldr1 (min) xs)
 
-addMay :: Num a => Maybe a -> Maybe a -> Maybe a
-addMay Nothing _ = Nothing
-addMay _ Nothing = Nothing
-addMay (Just a) (Just b) = Just (a + b)
-
 queryGreek :: GreekData -> String -> Maybe Double
 queryGreek d k = divVal
   where 
@@ -88,3 +83,29 @@ addSalaries2 sals p1 p2 = yLink (+) (lookupMay p1 sals) (lookupMay p2 sals)
 
 mkMaybe :: a -> Maybe a
 mkMaybe = Just
+
+tailProd :: Num a => [a] -> Maybe a
+tailProd
+  = (transMaybe product) . tailMay
+
+
+tailSum :: Num a => [a] -> Maybe a
+tailSum
+  = (transMaybe sum) . tailMay
+
+transMaybe :: (a -> b) -> Maybe a -> Maybe b
+transMaybe f a
+  = link a (\a ->
+    mkMaybe (f a))
+
+tailMax :: Ord a => [a] -> Maybe (Maybe a)
+tailMax
+  = (transMaybe maximumMay) . tailMay
+
+tailMin :: Ord a => [a] -> Maybe (Maybe a)
+tailMin
+  = (transMaybe minimumMay) . tailMay
+
+combine :: Maybe (Maybe a) -> Maybe a
+combine Nothing = Nothing
+combine (Just a) = a
