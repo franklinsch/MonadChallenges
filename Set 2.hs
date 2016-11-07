@@ -72,8 +72,8 @@ queryGreek2 g s
     divMay (fromIntegral maxTail) (fromIntegral head)))))
 
 addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
-addSalaries sals p1 p2 = sum
-  where 
-    p1Sal = lookupMay p1 sals
-    p2Sal = lookupMay p2 sals
-    sum = addMay p1Sal p2Sal
+addSalaries sals p1 p2
+  = link (lookupMay p1 sals) (\p1Sal ->
+    link (lookupMay p2 sals) (\p2Sal ->
+    Just (p1Sal + p2Sal)))
+    
