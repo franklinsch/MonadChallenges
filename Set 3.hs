@@ -30,4 +30,4 @@ allCombs' :: (a -> b -> c) -> [a] -> [b] -> [c]
 allCombs' f xs ys = combStep (map f xs) ys
 
 allCombs3' :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
-allCombs3' f xs ys zs = combStep (combStep (map f xs) ys) zs
+allCombs3' f xs ys zs = combStep (allCombs' f xs ys) zs
