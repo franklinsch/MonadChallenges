@@ -29,8 +29,7 @@ randPair'' = generalPair2' randLetter rand
 
 repRandom2 :: [Gen a] -> Gen [a]
 repRandom2 [] = mkGen []
-repRandom2 (g:gs) = 
-genTwo g (\g' ->
+repRandom2 (g:gs) = genTwo g (\g' ->
     genTwo (repRandom2 gs) (\gs' ->
       mkGen (g':gs')))
 
