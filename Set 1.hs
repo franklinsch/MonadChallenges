@@ -16,6 +16,24 @@ generalA = (.) . (flip (&&&) snd) . (flip (.) fst)
 generalB :: (a -> b -> c) -> Gen a -> Gen b -> Gen c
 generalB = flip (.) ((flip (.) (((&&&) fst) . (flip (.) snd))) . (flip (.))) . (.) . (.) . morph
 
+generalB2 :: (a -> b -> c) -> Gen a -> Gen b -> Gen c
+generalB2 f ga gb = 
+    genTwo ga (\aa -> 
+            genTwo gb (\bb ->
+                        mkGen $ f aa bb))
+
+generalPair2' :: Gen a -> Gen b -> Gen (a, b)
+generalPair2' = generalB2 (,)
+
+randPair'' = generalPair2' randLetter rand
+
+repRandom2 :: [Gen a] -> Gen [a]
+repRandom2 [] = mkGen []
+repRandom2 (g:gs) = 
+genTwo g (\g' ->
+    genTwo (repRandom2 gs) (\gs' ->
+      mkGen (g':gs')))
+
 generalPair2 :: Gen a -> Gen b -> Gen (a,b)
 generalPair2 = generalB (,)
 
