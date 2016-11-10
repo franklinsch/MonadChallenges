@@ -30,6 +30,9 @@ sequence (g:gs) = bind g (\g' ->
                   bind (sequence gs) (\gs' ->
                   return (g':gs')))
 
+liftM :: Monad m => (a -> b) -> m a -> m b
+liftM f a = bind a (\a -> return $ f a)
+
 liftM2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
 liftM2 f ga gb = bind ga (\aa -> 
                  bind gb (\bb ->
@@ -61,7 +64,7 @@ randString3 :: String
 randString3 = evalGen (sequence (take 3 (repeat randLetter))) (mkSeed 1)
 
 generalA :: (a -> b) -> Gen a -> Gen b
-generalA f g = (=<<) (return . f) g
+generalA = liftM
 
 generalB :: (a -> b -> c) -> Gen a -> Gen b -> Gen c
 generalB = liftM2
@@ -106,3 +109,111 @@ randTen :: Gen Integer
 randTen = generalA (*10) (Gen rand)
 
 randPair = generalPair2 randLetter (Gen rand)
+
+-- Set 2
+
+{-headMay :: [a] -> Maybe a-}
+{-headMay (x : _) = Just x-}
+{-headMay [] = Nothing-}
+
+{-tailMay :: [a] -> Maybe [a]-}
+{-tailMay (_ : xs) = Just xs-}
+{-tailMay [] = Nothing-}
+
+{-lookupMay :: Eq a => a -> [(a,b)] -> Maybe b-}
+{-lookupMay v ds = headMay $ map snd $ filter ((==) v.fst) ds-}
+
+{-divMay :: (Eq a, Fractional a) => a -> a -> Maybe a-}
+{-divMay _ 0 = Nothing-}
+{-divMay x y = Just (x / y)-}
+
+{-maximumMay :: Ord a => [a] -> Maybe a-}
+{-maximumMay [] = Nothing -}
+{-maximumMay xs = Just (foldr1 (max) xs)-}
+
+{-minimumMay :: Ord a => [a] -> Maybe a-}
+{-minimumMay [] = Nothing -}
+{-minimumMay xs = Just (foldr1 (min) xs)-}
+
+{-queryGreek d k = divVal-}
+  {-where -}
+  {-xs = lookupMay k d -}
+  {-tail = case xs of-}
+    {-Nothing    -> Nothing-}
+    {-Just xs'   -> tailMay xs'-}
+  {-maxTail = case tail of-}
+    {-Nothing    -> Nothing-}
+    {-Just tail' -> maximumMay tail'-}
+  {-Just xs' = xs-}
+  {-Just head = headMay xs'-}
+  {-divVal = case maxTail of-}
+    {-Nothing       -> Nothing-}
+    {-Just maxTail' -> divMay (fromIntegral maxTail') (fromIntegral head)-}
+
+{-chain :: (a -> Maybe b) -> Maybe a -> Maybe b-}
+{-chain = (=<<)-}
+
+{-link :: Maybe a -> (a -> Maybe b) -> Maybe b-}
+{-link = bind-}
+
+{-queryGreek2 :: GreekData -> String -> Maybe Double-}
+{-queryGreek2 g s-}
+  {-= link (lookupMay s g) (\xs ->-}
+    {-link (headMay xs) (\head ->-}
+    {-link (tailMay xs) (\tail -> -}
+    {-link (maximumMay tail) (\maxTail ->-}
+    {-divMay (fromIntegral maxTail) (fromIntegral head)))))-}
+
+{-addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer-}
+{-addSalaries sals p1 p2-}
+  {-= link (lookupMay p1 sals) (\p1Sal ->-}
+    {-link (lookupMay p2 sals) (\p2Sal ->-}
+    {-mkMaybe (p1Sal + p2Sal)))-}
+    
+{-yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c-}
+{-yLink = liftM2-}
+
+{-addSalaries2 :: [(String, Integer)] -> String -> String -> Maybe Integer-}
+{-addSalaries2 sals p1 p2 = yLink (+) (lookupMay p1 sals) (lookupMay p2 sals)-}
+
+{-mkMaybe :: a -> Maybe a-}
+{-mkMaybe = Just-}
+
+{-tailProd :: Num a => [a] -> Maybe a-}
+{-tailProd-}
+  {-= (transMaybe product) . tailMay-}
+
+
+{-tailSum :: Num a => [a] -> Maybe a-}
+{-tailSum-}
+  {-= (transMaybe sum) . tailMay-}
+
+{-transMaybe :: (a -> b) -> Maybe a -> Maybe b-}
+{-transMaybe = liftM-}
+
+{-tailMax :: Ord a => [a] -> Maybe (Maybe a)-}
+{-tailMax-}
+  {-= (transMaybe maximumMay) . tailMay-}
+
+{-tailMin :: Ord a => [a] -> Maybe (Maybe a)-}
+{-tailMin-}
+  {-= (transMaybe minimumMay) . tailMay-}
+
+{-combine :: Maybe (Maybe a) -> Maybe a-}
+{-combine Nothing = Nothing-}
+
+-- Set 3
+
+data Card = Card Int String
+
+allCards :: [Int] -> [String] -> [Card]
+allCards = liftM2 Card
+
+allCombs :: (a -> b -> c) -> [a] -> [b] -> [c]
+allCombs f as bs = return f `ap` as `ap` bs
+
+allCombs3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
+allCombs3 f as bs cs = return f `ap` as `ap` bs `ap` cs
+
+combStep :: [a -> b] -> [a] -> [b]
+combStep = ap
